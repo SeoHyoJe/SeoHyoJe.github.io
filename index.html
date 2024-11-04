@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plane Division Practice</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        #canvas {
+            border: 1px solid black;
+            margin-top: 20px;
+            background-color: #f0f0f0;
+        }
+        #info {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Plane Division Practice</h1>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="info">Regions: 1</div>
+    <button onclick="clearCanvas()">Clear</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const info = document.getElementById('info');
+        let isDrawing = false;
+        let lines = [];
+        let regions = 1;
+
+        function drawCircle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 200, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        function startLine(event) {
+            isDrawing = true;
+            const { offsetX, offsetY } = event;
+            lines.push([{ x: offsetX, y: offsetY }]);
+        }
+
+        function drawLine(event) {
+            if (!isDrawing) return;
+            const { offsetX, offsetY } = event;
+            const currentLine = lines[lines.length - 1];
+            currentLine.push({ x: offsetX, y: offsetY });
+            drawCircle();
+            drawAllLines();
+        }
+
+        function endLine() {
+            if (isDrawing) {
+                isDrawing = false;
+                calculateRegions();
+            }
+        }
+
+        function drawAllLines() {
+            ctx.beginPath();
+            lines.forEach(line => {
+                ctx.moveTo(line[0].x, line[0].y);
+                line.forEach(point => {
+                    ctx.lineTo(point.x, point.y);
+                });
+            });
+            ctx.stroke();
+        }
+
+        function calculateRegions() {
+            // Simple calculation: regions increase with each line. Improve this based on your needs.
+            regions = lines.length + 1;
+            info.innerText = `Regions: ${regions}`;
+        }
+
+        function clearCanvas() {
+            lines = [];
+            regions = 1;
+            info.innerText = 'Regions: 1';
+            drawCircle();
+        }
+
+        canvas.addEventListener('mousedown', startLine);
+        canvas.addEventListener('mousemove', drawLine);
+        canvas.addEventListener('mouseup', endLine);
+        canvas.addEventListener('mouseleave', endLine);
+
+        drawCircle();
+    </script>
+</body>
+</html>
